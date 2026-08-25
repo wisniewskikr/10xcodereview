@@ -9,9 +9,14 @@
  */
 
 import { closeSync, openSync, readFileSync, readSync, realpathSync, statSync } from "node:fs";
-import { basename, dirname, isAbsolute, resolve, sep } from "node:path";
+import { basename, dirname, isAbsolute, relative, resolve, sep } from "node:path";
 
-/** Directory names the tools never walk into. Noise that costs tokens. */
+/**
+ * Directory names no tool may enter. Not just noise that costs tokens: a real
+ * run spent half its step budget reading node_modules/ai internals instead of
+ * the file under review, so the skip is enforced in the guard where all three
+ * tools share it, not only when filtering a listing.
+ */
 export const skippedDirectories: ReadonlySet<string> = new Set(["node_modules", ".git", "dist"]);
 
 /** 256 KiB - comfortably more than any source file, far less than a bundle. */
@@ -106,6 +111,16 @@ export function createWorkspace(root: string, limits: WorkspaceLimits = {}): Wor
     return isSecretFileName(basename(inputPath));
   }
 
+  /**
+   * The first skipped segment below the root, if the path crosses one. Segments
+   * above the root are not this workspace's business - a root that itself sits
+   * inside a "dist" directory is perfectly legitimate.
+   */
+  function skippedSegment(absolute: string): string | undefined {
+    const segments = relative(realRoot, absolute).split(sep);
+    return segments.find((segment) => skippedDirectories.has(segment));
+  }
+
   function resolvePath(inputPath: string): string {
     const absolute = isAbsolute(inputPath) ? resolve(inputPath) : resolve(realRoot, inputPath);
 
@@ -115,6 +130,14 @@ export function createWorkspace(root: string, limits: WorkspaceLimits = {}): Wor
       throw new Error(
         `"${inputPath}" is outside the workspace. This reviewer may only read files at or ` +
           `beneath ${realRoot}. Pass a path relative to that directory.`,
+      );
+    }
+
+    const skipped = skippedSegment(absolute);
+    if (skipped !== undefined) {
+      throw new Error(
+        `"${inputPath}" is under ${skipped}, which this reviewer never reads. ` +
+          `Stay in the project's own sources - dependencies and build output are out of scope.`,
       );
     }
 

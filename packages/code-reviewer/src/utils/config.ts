@@ -8,6 +8,10 @@ const configSchema = z.object({
   maxOutputTokens: z.number().int().positive(),
   requestTimeoutMs: z.number().int().positive(),
   maxRetries: z.number().int().min(0),
+  // The structured output is generated in its own step, so a budget of N allows N-1 tool steps.
+  maxSteps: z.number().int().positive(),
+  maxFileBytes: z.number().int().positive(),
+  maxSearchResults: z.number().int().positive(),
   logDirectory: z.string().min(1),
   appName: z.string().min(1),
 });

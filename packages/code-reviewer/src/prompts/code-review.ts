@@ -37,41 +37,43 @@ export type CodeReviewPromptVariant = keyof typeof codeReviewInstructionVariants
 export const defaultPromptVariant: CodeReviewPromptVariant = "default";
 
 /**
+ * What a single review call is pointed at.
+ *
+ * Defined here rather than in the agent module because the prompt builder is
+ * its only structural consumer; `agent/` re-exports it as the public name.
+ */
+export type CodeReviewTarget =
+  | { kind: "file"; path: string }
+  | { kind: "inline"; fileName: string; code: string };
+
+/**
  * Builds the user message for a review target.
  *
- * The two input kinds get materially different messages on purpose: an inline
- * target carries its code in the prompt, while a path target deliberately does
- * not, so the agent has to reach for its tools to see anything at all.
- *
- * The parameter is structural for now; Phase 3 tightens it to `CodeReviewTarget`.
+ * The two kinds get materially different messages on purpose: an inline target
+ * carries its code in the prompt, while a file target deliberately does not, so
+ * the agent has to reach for its tools to see anything at all.
  */
-export function buildCodeReviewPrompt(target: {
-  fileName: string;
-  code?: string;
-  path?: string;
-}): string {
-  if (target.code !== undefined) {
-    return [
-      `Review the following file: ${target.fileName}`,
-      "",
-      "```",
-      target.code,
-      "```",
-    ].join("\n");
-  }
+export function buildCodeReviewPrompt(target: CodeReviewTarget): string {
+  switch (target.kind) {
+    case "inline":
+      return [
+        `Review the following file: ${target.fileName}`,
+        "",
+        "```",
+        target.code,
+        "```",
+        "",
+        "This snippet is the whole target and it is not on disk - there is no file to read.",
+      ].join("\n");
 
-  if (target.path !== undefined) {
-    return [
-      `Review the file at this workspace-relative path: ${target.path}`,
-      "",
-      "Its contents are deliberately not included here - read it with your readFile tool first.",
-      "Then follow whatever you need to judge it: the modules it imports, the callers of what",
-      "it exports, a sibling type whose shape you are unsure of.",
-      "Report findings on that file only; everything else you read is context.",
-    ].join("\n");
+    case "file":
+      return [
+        `Review the file at this workspace-relative path: ${target.path}`,
+        "",
+        "Its contents are deliberately not included here - read it with your readFile tool first.",
+        "Then follow whatever you need to judge it: the modules it imports, the callers of what",
+        "it exports, a sibling type whose shape you are unsure of.",
+        "Report findings on that file only; everything else you read is context.",
+      ].join("\n");
   }
-
-  throw new Error(
-    `Cannot build a review prompt for ${target.fileName}: no inline code and no file path.`,
-  );
 }

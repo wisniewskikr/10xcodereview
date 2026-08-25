@@ -135,6 +135,32 @@ describe("createWorkspace().resolve", () => {
     assert.throws(() => workspace.readTextFile(escapeRoute), /outside the workspace/);
   });
 
+  it("rejects a path under a skipped directory", () => {
+    const { root } = makeFixture();
+    const workspace = createWorkspace(root);
+    mkdirSync(join(workspace.root, "node_modules", "pkg"), { recursive: true });
+    writeFileSync(join(workspace.root, "node_modules", "pkg", "index.d.ts"), "export {};\n", "utf8");
+
+    assert.throws(() => workspace.resolve("node_modules"), /never reads/);
+    assert.throws(() => workspace.resolve("node_modules/pkg"), /never reads/);
+    assert.throws(() => workspace.readTextFile("node_modules/pkg/index.d.ts"), /never reads/);
+    assert.throws(
+      () => workspace.resolve(join(workspace.root, "node_modules", "pkg")),
+      /never reads/,
+    );
+  });
+
+  it("allows a root that itself sits inside a skipped directory", () => {
+    const { root } = makeFixture();
+    // The skip applies to segments below the root, not above it.
+    const nested = join(root, "dist", "app");
+    mkdirSync(join(nested, "src"), { recursive: true });
+    writeFileSync(join(nested, "src", "main.ts"), "export const x = 1;\n", "utf8");
+    const workspace = createWorkspace(nested);
+
+    assert.equal(workspace.readTextFile("src/main.ts").text, "export const x = 1;\n");
+  });
+
   it("rejects a credential file even when it sits inside the root", () => {
     const { root } = makeFixture();
     const workspace = createWorkspace(root);

@@ -5,5 +5,8 @@
   "requestTimeoutMs": 120000,
   "maxRetries": 2,
   "logDirectory": "logs",
-  "appName": "code-reviewer"
+  "appName": "code-reviewer",
+  "maxSteps": 16,
+  "maxFileBytes": 262144,
+  "maxSearchResults": 40
 }

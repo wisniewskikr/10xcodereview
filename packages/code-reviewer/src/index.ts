@@ -1,6 +1,7 @@
-import { readFileSync } from "node:fs";
-import { basename } from "node:path";
-import { reviewCode, type CodeReview } from "./services/code-review.js";
+import { createCodeReviewer, fileTarget, inlineTarget } from "./agent/code-review-agent.js";
+import { CodeReviewError } from "./agent/errors.js";
+import type { CodeReviewTarget } from "./prompts/code-review.js";
+import type { CodeReview } from "./schemas/code-review.js";
 import { log } from "./utils/logger.js";
 
 /** A tiny, deliberately buggy snippet so `npm start` works with no arguments. */
@@ -12,11 +13,8 @@ const sampleCode = `export function averageOf(numbers: number[]): number {
   return total / numbers.length;
 }`;
 
-function readInput(filePath: string | undefined): { fileName: string; code: string } {
-  if (filePath === undefined) {
-    return { fileName: "sample.ts", code: sampleCode };
-  }
-  return { fileName: basename(filePath), code: readFileSync(filePath, "utf8") };
+function readTarget(filePath: string | undefined): CodeReviewTarget {
+  return filePath === undefined ? inlineTarget("sample.ts", sampleCode) : fileTarget(filePath);
 }
 
 function printReview(review: CodeReview): void {
@@ -36,12 +34,15 @@ function printReview(review: CodeReview): void {
 }
 
 async function main(): Promise<void> {
-  const input = readInput(process.argv[2]);
-  const review = await reviewCode(input);
+  const review = await createCodeReviewer().review(readTarget(process.argv[2]));
   printReview(review);
 }
 
 main().catch((error: unknown) => {
-  log.error(error instanceof Error ? error.message : String(error));
+  if (CodeReviewError.isInstance(error)) {
+    log.error(`${error.reason}: ${error.message}`);
+  } else {
+    log.error(error instanceof Error ? error.message : String(error));
+  }
   process.exitCode = 1;
 });

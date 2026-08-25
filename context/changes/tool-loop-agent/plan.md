@@ -412,32 +412,32 @@ Nothing persists, so there is no data migration. The breaking change is API-shap
 
 #### Automated
 
-- [x] 2.1 Type checking passes: `npm run typecheck`
-- [x] 2.2 Unit tests pass: `npm test`
-- [x] 2.3 Traversal (`../` and absolute-outside-root) is rejected
-- [x] 2.4 Symlink escape is rejected, or skips with a clear message
-- [x] 2.5 `dist/` contains no test artifacts after `npm run build`
+- [x] 2.1 Type checking passes: `npm run typecheck` — f8c4be6
+- [x] 2.2 Unit tests pass: `npm test` — f8c4be6
+- [x] 2.3 Traversal (`../` and absolute-outside-root) is rejected — f8c4be6
+- [x] 2.4 Symlink escape is rejected, or skips with a clear message — f8c4be6
+- [x] 2.5 `dist/` contains no test artifacts after `npm run build` — f8c4be6
 
 #### Manual
 
-- [x] 2.6 `readFile` on `../../.env` fails naming the workspace root, leaking nothing
-- [x] 2.7 Search returns plausible matches with correct line numbers
-- [x] 2.8 `listDirectory` omits `node_modules`, `.git`, and `dist`
+- [x] 2.6 `readFile` on `../../.env` fails naming the workspace root, leaking nothing — f8c4be6
+- [x] 2.7 Search returns plausible matches with correct line numbers — f8c4be6
+- [x] 2.8 `listDirectory` omits `node_modules`, `.git`, and `dist` — f8c4be6
 
 ### Phase 3: The Agent
 
 #### Automated
 
-- [ ] 3.1 Type checking passes: `npm run typecheck`
-- [ ] 3.2 Unit tests pass: `npm test`
-- [ ] 3.3 `src/services/code-review.ts` is deleted and unreferenced
-- [ ] 3.4 Mock-model test asserts malformed output raises `CodeReviewError`
+- [x] 3.1 Type checking passes: `npm run typecheck`
+- [x] 3.2 Unit tests pass: `npm test`
+- [x] 3.3 `src/services/code-review.ts` is deleted and unreferenced
+- [x] 3.4 Mock-model test asserts malformed output raises `CodeReviewError`
 
 #### Manual
 
-- [ ] 3.5 A real run shows at least one tool call in the log
-- [ ] 3.6 The trace names tool inputs but contains no file contents
-- [ ] 3.7 Two reviewers on different models run in one process without interfering
+- [x] 3.5 A real run shows at least one tool call in the log
+- [x] 3.6 The trace names tool inputs but contains no file contents
+- [x] 3.7 Two reviewers on different models run in one process without interfering
 
 ### Phase 4: CLI, Public Surface, and Docs
 
