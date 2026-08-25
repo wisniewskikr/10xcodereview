@@ -1,8 +1,11 @@
 /**
  * Prompts for the code review. Edit the text here - no code changes needed.
+ *
+ * Instructions are a keyed record of named variants rather than one constant, so
+ * a prompt eval is a loop over the keys and every variant is a reviewable diff.
  */
 
-export const codeReviewInstructions = [
+const defaultInstructions = [
   "You are a meticulous senior software engineer reviewing a code change.",
   "Report only real problems: bugs, security holes, data loss, race conditions,",
   "misleading names, and dead or duplicated logic.",
@@ -11,15 +14,64 @@ export const codeReviewInstructions = [
   "If the code is fine, return an empty list of findings and say so in the summary.",
 ].join(" ");
 
-export function buildCodeReviewPrompt(input: {
+const evidenceFirstInstructions = [
+  "You are a code reviewer who reports only what you can prove from the code in front of you.",
+  "Before you report anything, check it with your tools: read the file, read the modules it",
+  "imports, and search the workspace for the callers of any contract you are about to question.",
+  "Drop every suspicion you could not corroborate that way - on this review a confident guess",
+  "is worse than silence.",
+  "Prefer three findings you verified over ten you assumed.",
+  "Name the exact line, and in the explanation say which file, caller, or definition convinced you.",
+  "Formatting, style, and anything a linter catches are out of scope.",
+  "If nothing survives that bar, return an empty list of findings and say in the summary what you checked.",
+].join(" ");
+
+/** Named instruction variants. Add a key here to make it available to an eval. */
+export const codeReviewInstructionVariants = {
+  default: defaultInstructions,
+  "evidence-first": evidenceFirstInstructions,
+} as const;
+
+export type CodeReviewPromptVariant = keyof typeof codeReviewInstructionVariants;
+
+export const defaultPromptVariant: CodeReviewPromptVariant = "default";
+
+/**
+ * Builds the user message for a review target.
+ *
+ * The two input kinds get materially different messages on purpose: an inline
+ * target carries its code in the prompt, while a path target deliberately does
+ * not, so the agent has to reach for its tools to see anything at all.
+ *
+ * The parameter is structural for now; Phase 3 tightens it to `CodeReviewTarget`.
+ */
+export function buildCodeReviewPrompt(target: {
   fileName: string;
-  code: string;
+  code?: string;
+  path?: string;
 }): string {
-  return [
-    `Review the following file: ${input.fileName}`,
-    "",
-    "```",
-    input.code,
-    "```",
-  ].join("\n");
+  if (target.code !== undefined) {
+    return [
+      `Review the following file: ${target.fileName}`,
+      "",
+      "```",
+      target.code,
+      "```",
+    ].join("\n");
+  }
+
+  if (target.path !== undefined) {
+    return [
+      `Review the file at this workspace-relative path: ${target.path}`,
+      "",
+      "Its contents are deliberately not included here - read it with your readFile tool first.",
+      "Then follow whatever you need to judge it: the modules it imports, the callers of what",
+      "it exports, a sibling type whose shape you are unsure of.",
+      "Report findings on that file only; everything else you read is context.",
+    ].join("\n");
+  }
+
+  throw new Error(
+    `Cannot build a review prompt for ${target.fileName}: no inline code and no file path.`,
+  );
 }

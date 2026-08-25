@@ -399,14 +399,14 @@ Nothing persists, so there is no data migration. The breaking change is API-shap
 
 #### Automated
 
-- [ ] 1.1 Type checking passes: `npm run typecheck`
-- [ ] 1.2 Build succeeds: `npm run build`
-- [ ] 1.3 No module declares review schemas outside `src/schemas/`
+- [x] 1.1 Type checking passes: `npm run typecheck`
+- [x] 1.2 Build succeeds: `npm run build`
+- [x] 1.3 No module declares review schemas outside `src/schemas/`
 
 #### Manual
 
-- [ ] 1.4 `npm start` reviews the built-in sample with unchanged output shape
-- [ ] 1.5 The alternative prompt variant is a genuinely different reviewing stance
+- [x] 1.4 `npm start` reviews the built-in sample with unchanged output shape
+- [x] 1.5 The alternative prompt variant is a genuinely different reviewing stance
 
 ### Phase 2: Workspace Guard and File Tools
 
