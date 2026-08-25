@@ -443,15 +443,15 @@ Nothing persists, so there is no data migration. The breaking change is API-shap
 
 #### Automated
 
-- [x] 4.1 Type checking passes: `npm run typecheck`
-- [x] 4.2 Build succeeds: `npm run build`
-- [x] 4.3 Unit tests pass: `npm test`
-- [x] 4.4 Importing the barrel has no side effects with `OPENROUTER_API_KEY` unset
-- [x] 4.5 CLI exits non-zero on a nonexistent path
+- [x] 4.1 Type checking passes: `npm run typecheck` — c698539
+- [x] 4.2 Build succeeds: `npm run build` — c698539
+- [x] 4.3 Unit tests pass: `npm test` — c698539
+- [x] 4.4 Importing the barrel has no side effects with `OPENROUTER_API_KEY` unset — c698539
+- [x] 4.5 CLI exits non-zero on a nonexistent path — c698539
 
 #### Manual
 
-- [x] 4.6 `npm start` reviews the built-in sample and prints findings
-- [x] 4.7 `npm start -- <real file>` produces a review with tool calls in the log
-- [x] 4.8 The Readme's structure tree matches the tree on disk
-- [x] 4.9 The Readme's import example works as written
+- [x] 4.6 `npm start` reviews the built-in sample and prints findings — c698539
+- [x] 4.7 `npm start -- <real file>` produces a review with tool calls in the log — c698539
+- [x] 4.8 The Readme's structure tree matches the tree on disk — c698539
+- [x] 4.9 The Readme's import example works as written — c698539
