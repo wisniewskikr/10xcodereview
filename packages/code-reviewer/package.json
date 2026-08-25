@@ -1,0 +1,24 @@
+{
+  "name": "@10xcodereview/code-reviewer",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "AI-powered code reviewer built on the Vercel AI SDK + OpenRouter",
+  "main": "dist/index.js",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "start": "tsx src/index.ts",
+    "build": "tsc",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@openrouter/ai-sdk-provider": "^3.0.0",
+    "ai": "^7.0.79",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@types/node": "^26.3.0",
+    "tsx": "^4.23.12",
+    "typescript": "^7.0.2"
+  }
+}
