@@ -30,4 +30,16 @@ function readConfig(): Config {
   return result.data;
 }
 
-export const config = readConfig();
+let cached: Config | undefined;
+
+/**
+ * Reads config.json once, on first use rather than on import.
+ *
+ * The public agent barrel pulls this module in transitively, and importing that
+ * barrel must not touch the filesystem - an eval harness may import it long
+ * before it decides to build a reviewer.
+ */
+export function getConfig(): Config {
+  cached ??= readConfig();
+  return cached;
+}

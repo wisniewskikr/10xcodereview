@@ -428,30 +428,30 @@ Nothing persists, so there is no data migration. The breaking change is API-shap
 
 #### Automated
 
-- [x] 3.1 Type checking passes: `npm run typecheck`
-- [x] 3.2 Unit tests pass: `npm test`
-- [x] 3.3 `src/services/code-review.ts` is deleted and unreferenced
-- [x] 3.4 Mock-model test asserts malformed output raises `CodeReviewError`
+- [x] 3.1 Type checking passes: `npm run typecheck` — f65a763
+- [x] 3.2 Unit tests pass: `npm test` — f65a763
+- [x] 3.3 `src/services/code-review.ts` is deleted and unreferenced — f65a763
+- [x] 3.4 Mock-model test asserts malformed output raises `CodeReviewError` — f65a763
 
 #### Manual
 
-- [x] 3.5 A real run shows at least one tool call in the log
-- [x] 3.6 The trace names tool inputs but contains no file contents
-- [x] 3.7 Two reviewers on different models run in one process without interfering
+- [x] 3.5 A real run shows at least one tool call in the log — f65a763
+- [x] 3.6 The trace names tool inputs but contains no file contents — f65a763
+- [x] 3.7 Two reviewers on different models run in one process without interfering — f65a763
 
 ### Phase 4: CLI, Public Surface, and Docs
 
 #### Automated
 
-- [ ] 4.1 Type checking passes: `npm run typecheck`
-- [ ] 4.2 Build succeeds: `npm run build`
-- [ ] 4.3 Unit tests pass: `npm test`
-- [ ] 4.4 Importing the barrel has no side effects with `OPENROUTER_API_KEY` unset
-- [ ] 4.5 CLI exits non-zero on a nonexistent path
+- [x] 4.1 Type checking passes: `npm run typecheck`
+- [x] 4.2 Build succeeds: `npm run build`
+- [x] 4.3 Unit tests pass: `npm test`
+- [x] 4.4 Importing the barrel has no side effects with `OPENROUTER_API_KEY` unset
+- [x] 4.5 CLI exits non-zero on a nonexistent path
 
 #### Manual
 
-- [ ] 4.6 `npm start` reviews the built-in sample and prints findings
-- [ ] 4.7 `npm start -- <real file>` produces a review with tool calls in the log
-- [ ] 4.8 The Readme's structure tree matches the tree on disk
-- [ ] 4.9 The Readme's import example works as written
+- [x] 4.6 `npm start` reviews the built-in sample and prints findings
+- [x] 4.7 `npm start -- <real file>` produces a review with tool calls in the log
+- [x] 4.8 The Readme's structure tree matches the tree on disk
+- [x] 4.9 The Readme's import example works as written

@@ -131,6 +131,19 @@ describe("searchWorkspace", () => {
     assert.equal(paths.some((path) => path.startsWith("linked")), false);
   });
 
+  it("shows the match even when it sits past the snippet cap", () => {
+    const { workspace } = makeFixture();
+    const farAway = `const padding = "${"x".repeat(400)}"; const findMeHere = 1;`;
+    writeFileSync(join(workspace.root, "src", "long.ts"), `${farAway}\n`, "utf8");
+
+    const outcome = searchWorkspace(workspace, { query: "findMeHere", filePattern: "long.ts" });
+
+    assert.equal(outcome.matches.length, 1);
+    const text = outcome.matches[0]?.text ?? "";
+    assert.ok(text.includes("findMeHere"), `snippet lost the match: ${text}`);
+    assert.ok(text.startsWith("..."), "expected a leading ellipsis for a mid-line window");
+  });
+
   it("rejects an empty query", () => {
     const { workspace } = makeFixture();
 

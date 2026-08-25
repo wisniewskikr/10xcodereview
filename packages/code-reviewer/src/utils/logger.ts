@@ -1,11 +1,9 @@
 import { appendFileSync, mkdirSync } from "node:fs";
 import { join } from "node:path";
-import { config } from "./config.js";
+import { getConfig } from "./config.js";
 import { fromProjectRoot } from "./paths.js";
 
 type Level = "INFO" | "WARN" | "ERROR";
-
-const logDirectory = fromProjectRoot(config.logDirectory);
 
 /** "2026-08-25 14:03:07" in local time. */
 function timestamp(date: Date): string {
@@ -15,8 +13,8 @@ function timestamp(date: Date): string {
   return `${day} ${time}`;
 }
 
-function logFilePath(date: Date): string {
-  return join(logDirectory, `${config.appName}-${timestamp(date).slice(0, 10)}.log`);
+function logFilePath(date: Date, logDirectory: string): string {
+  return join(logDirectory, `${getConfig().appName}-${timestamp(date).slice(0, 10)}.log`);
 }
 
 function write(level: Level, message: string): void {
@@ -25,8 +23,9 @@ function write(level: Level, message: string): void {
 
   console.log(line);
 
+  const logDirectory = fromProjectRoot(getConfig().logDirectory);
   mkdirSync(logDirectory, { recursive: true });
-  appendFileSync(logFilePath(now), `${line}\n`, "utf8");
+  appendFileSync(logFilePath(now, logDirectory), `${line}\n`, "utf8");
 }
 
 export const log = {

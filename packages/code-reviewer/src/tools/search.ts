@@ -7,6 +7,32 @@ import { skippedDirectories, type Workspace } from "./workspace.js";
 /** Longest snippet returned per match. Long minified lines are not worth the tokens. */
 const maxMatchTextLength = 200;
 
+/**
+ * A window of the line around the match.
+ *
+ * Slicing from the start instead would report a hit whose snippet never
+ * contains the query - which is exactly the long-line case the cap exists for,
+ * and the model has no other way to see why the line matched.
+ */
+function excerpt(line: string, matchIndex: number): string {
+  const trimmed = line.trim();
+  if (trimmed.length <= maxMatchTextLength) {
+    return trimmed;
+  }
+
+  const lead = line.length - line.trimStart().length;
+  const indexInTrimmed = Math.max(0, matchIndex - lead);
+
+  // Leave a third of the window before the match so it reads in context.
+  const start = Math.min(
+    Math.max(0, indexInTrimmed - Math.floor(maxMatchTextLength / 3)),
+    trimmed.length - maxMatchTextLength,
+  );
+  const end = start + maxMatchTextLength;
+
+  return `${start > 0 ? "..." : ""}${trimmed.slice(start, end)}${end < trimmed.length ? "..." : ""}`;
+}
+
 export interface SearchMatch {
   /** Workspace-relative path, always with forward slashes. */
   path: string;
@@ -140,15 +166,15 @@ export function searchWorkspace(
     const lines = file.text.split("\n");
     for (const [offset, line] of lines.entries()) {
       const haystack = caseSensitive ? line : line.toLowerCase();
-      if (!haystack.includes(needle)) {
+      const matchIndex = haystack.indexOf(needle);
+      if (matchIndex === -1) {
         continue;
       }
 
-      const text = line.trim();
       matches.push({
         path: relativePath,
         line: offset + 1,
-        text: text.length > maxMatchTextLength ? `${text.slice(0, maxMatchTextLength)}...` : text,
+        text: excerpt(line, matchIndex),
       });
 
       if (matches.length >= workspace.maxSearchResults) {

@@ -11,7 +11,7 @@ import { codeReviewSchema, type CodeReview } from "../schemas/code-review.js";
 import { createReviewModel } from "../services/model.js";
 import { createFileTools } from "../tools/index.js";
 import { createWorkspace } from "../tools/workspace.js";
-import { config } from "../utils/config.js";
+import { getConfig } from "../utils/config.js";
 import { CodeReviewError } from "./errors.js";
 import { createTracingCallbacks } from "./tracing.js";
 
@@ -32,7 +32,11 @@ export interface CodeReviewAgentOptions {
   /** Total steps, output step included: a budget of N allows N-1 tool steps. */
   maxSteps?: number;
   maxRetries?: number;
-  /** Milliseconds. */
+  /**
+   * Milliseconds allowed for a single model call, not for the whole loop.
+   * A tool loop makes several calls, so a total budget this size would abort a
+   * healthy run partway through.
+   */
   timeout?: number;
   maxFileBytes?: number;
   maxSearchResults?: number;
@@ -47,7 +51,7 @@ export interface CodeReviewer {
 
 function resolveModel(model: string | LanguageModel | undefined): LanguageModel {
   if (model === undefined) {
-    return createReviewModel(config.model);
+    return createReviewModel(getConfig().model);
   }
   // A string is an id to look up; anything else is already a model.
   return typeof model === "string" ? createReviewModel(model) : model;
@@ -55,7 +59,7 @@ function resolveModel(model: string | LanguageModel | undefined): LanguageModel 
 
 function describeModel(model: string | LanguageModel | undefined): string {
   if (model === undefined) {
-    return config.model;
+    return getConfig().model;
   }
   if (typeof model === "string") {
     return model;
@@ -64,7 +68,10 @@ function describeModel(model: string | LanguageModel | undefined): string {
 }
 
 export function createCodeReviewAgent(options: CodeReviewAgentOptions = {}) {
+  const config = getConfig();
   const promptVariant = options.promptVariant ?? defaultPromptVariant;
+  const maxSteps = options.maxSteps ?? config.maxSteps;
+  const perCallTimeoutMs = options.timeout ?? config.requestTimeoutMs;
 
   // The root is captured by closure here, so no tool can exist without it.
   const workspace = createWorkspace(options.workspaceRoot ?? process.cwd(), {
@@ -78,11 +85,14 @@ export function createCodeReviewAgent(options: CodeReviewAgentOptions = {}) {
     tools: createFileTools(workspace),
     output: Output.object({ schema: codeReviewSchema }),
     // Producing the structured object costs a step of its own.
-    stopWhen: isStepCount(options.maxSteps ?? config.maxSteps),
+    stopWhen: isStepCount(maxSteps),
     temperature: options.temperature ?? config.temperature,
     maxOutputTokens: options.maxOutputTokens ?? config.maxOutputTokens,
     maxRetries: options.maxRetries ?? config.maxRetries,
-    timeout: options.timeout ?? config.requestTimeoutMs,
+    // A bare number here would be the TOTAL for the whole loop, which killed a
+    // real run at 120s mid-review. Per-step is what requestTimeoutMs means; the
+    // total is derived so it always scales with the step budget.
+    timeout: { stepMs: perCallTimeoutMs, totalMs: perCallTimeoutMs * maxSteps },
     ...createTracingCallbacks({
       modelId: describeModel(options.model),
       promptVariant,

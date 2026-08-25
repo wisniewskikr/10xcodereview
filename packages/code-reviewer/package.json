@@ -4,7 +4,14 @@
   "private": true,
   "type": "module",
   "description": "AI-powered code reviewer built on the Vercel AI SDK + OpenRouter",
-  "main": "dist/index.js",
+  "main": "dist/agent/index.js",
+  "types": "dist/agent/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/agent/index.d.ts",
+      "import": "./dist/agent/index.js"
+    }
+  },
   "scripts": {
     "dev": "tsx watch src/index.ts",
     "start": "tsx src/index.ts",

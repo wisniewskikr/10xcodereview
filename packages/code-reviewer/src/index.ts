@@ -1,7 +1,12 @@
-import { createCodeReviewer, fileTarget, inlineTarget } from "./agent/code-review-agent.js";
-import { CodeReviewError } from "./agent/errors.js";
-import type { CodeReviewTarget } from "./prompts/code-review.js";
-import type { CodeReview } from "./schemas/code-review.js";
+/**
+ * The CLI. Argument handling, rendering, and an exit code - nothing else, so
+ * everything library-shaped lives behind the side-effect-free agent/ barrel.
+ */
+
+import { CodeReviewError, createCodeReviewer, fileTarget, inlineTarget } from "./agent/index.js";
+import type { CodeReviewTarget } from "./agent/index.js";
+import { renderReview } from "./cli/render.js";
+import { createWorkspace } from "./tools/workspace.js";
 import { log } from "./utils/logger.js";
 
 /** A tiny, deliberately buggy snippet so `npm start` works with no arguments. */
@@ -13,29 +18,22 @@ const sampleCode = `export function averageOf(numbers: number[]): number {
   return total / numbers.length;
 }`;
 
-function readTarget(filePath: string | undefined): CodeReviewTarget {
-  return filePath === undefined ? inlineTarget("sample.ts", sampleCode) : fileTarget(filePath);
-}
-
-function printReview(review: CodeReview): void {
-  console.log(`\n${review.summary}\n`);
-
-  if (review.findings.length === 0) {
-    console.log("No findings.");
-    return;
+function parseTarget(argument: string | undefined): CodeReviewTarget {
+  if (argument === undefined) {
+    return inlineTarget("sample.ts", sampleCode);
   }
 
-  for (const finding of review.findings) {
-    const location = finding.line === null ? "whole file" : `line ${finding.line}`;
-    console.log(`[${finding.severity.toUpperCase()}] ${location} - ${finding.title}`);
-    console.log(`  why: ${finding.explanation}`);
-    console.log(`  fix: ${finding.suggestion}\n`);
-  }
+  // Check the path against the same boundary the agent's tools enforce, so a
+  // typo or an out-of-workspace path fails here instead of costing a model call
+  // that could only report the miss back to us.
+  createWorkspace(process.cwd()).readTextFile(argument);
+
+  return fileTarget(argument);
 }
 
 async function main(): Promise<void> {
-  const review = await createCodeReviewer().review(readTarget(process.argv[2]));
-  printReview(review);
+  const review = await createCodeReviewer().review(parseTarget(process.argv[2]));
+  console.log(renderReview(review));
 }
 
 main().catch((error: unknown) => {
