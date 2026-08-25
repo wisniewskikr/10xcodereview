@@ -1,0 +1,15 @@
+{
+  "name": "hello-world-ts",
+  "version": "1.0.0",
+  "description": "Minimal Hello World example in TypeScript",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "tsc && node dist/index.js"
+  },
+  "devDependencies": {
+    "typescript": "^5.5.4"
+  }
+}
