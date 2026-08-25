@@ -399,30 +399,30 @@ Nothing persists, so there is no data migration. The breaking change is API-shap
 
 #### Automated
 
-- [x] 1.1 Type checking passes: `npm run typecheck`
-- [x] 1.2 Build succeeds: `npm run build`
-- [x] 1.3 No module declares review schemas outside `src/schemas/`
+- [x] 1.1 Type checking passes: `npm run typecheck` — 2b00df1
+- [x] 1.2 Build succeeds: `npm run build` — 2b00df1
+- [x] 1.3 No module declares review schemas outside `src/schemas/` — 2b00df1
 
 #### Manual
 
-- [x] 1.4 `npm start` reviews the built-in sample with unchanged output shape
-- [x] 1.5 The alternative prompt variant is a genuinely different reviewing stance
+- [x] 1.4 `npm start` reviews the built-in sample with unchanged output shape — 2b00df1
+- [x] 1.5 The alternative prompt variant is a genuinely different reviewing stance — 2b00df1
 
 ### Phase 2: Workspace Guard and File Tools
 
 #### Automated
 
-- [ ] 2.1 Type checking passes: `npm run typecheck`
-- [ ] 2.2 Unit tests pass: `npm test`
-- [ ] 2.3 Traversal (`../` and absolute-outside-root) is rejected
-- [ ] 2.4 Symlink escape is rejected, or skips with a clear message
-- [ ] 2.5 `dist/` contains no test artifacts after `npm run build`
+- [x] 2.1 Type checking passes: `npm run typecheck`
+- [x] 2.2 Unit tests pass: `npm test`
+- [x] 2.3 Traversal (`../` and absolute-outside-root) is rejected
+- [x] 2.4 Symlink escape is rejected, or skips with a clear message
+- [x] 2.5 `dist/` contains no test artifacts after `npm run build`
 
 #### Manual
 
-- [ ] 2.6 `readFile` on `../../.env` fails naming the workspace root, leaking nothing
-- [ ] 2.7 Search returns plausible matches with correct line numbers
-- [ ] 2.8 `listDirectory` omits `node_modules`, `.git`, and `dist`
+- [x] 2.6 `readFile` on `../../.env` fails naming the workspace root, leaking nothing
+- [x] 2.7 Search returns plausible matches with correct line numbers
+- [x] 2.8 `listDirectory` omits `node_modules`, `.git`, and `dist`
 
 ### Phase 3: The Agent
 
