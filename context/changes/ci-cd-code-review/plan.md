@@ -570,7 +570,7 @@ Not applicable — this is new infrastructure with no existing data or prior wor
 
 #### Automated
 
-- [x] 3.1 `action.yml` validates (actionlint if available)
+- [x] 3.1 `action.yml` validates (actionlint if available) — af02f6e
 
 #### Manual
 
@@ -580,7 +580,7 @@ Not applicable — this is new infrastructure with no existing data or prior wor
 
 #### Automated
 
-- [ ] 4.1 Workflow YAML validates (actionlint if available)
+- [x] 4.1 Workflow YAML validates (actionlint if available)
 
 #### Manual
 

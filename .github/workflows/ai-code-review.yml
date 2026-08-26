@@ -1,0 +1,100 @@
+name: AI Code Review
+
+# This workflow's safety against retriggering itself - it applies the
+# `ai-cr:review` label to PRs it reviews, and `labeled` is one of its own
+# triggers - depends entirely on running as `GITHUB_TOKEN`, which never
+# starts new workflow runs. That guarantee breaks the moment a PAT or a
+# GitHub App token is substituted in for `github.token` below.
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened, labeled]
+
+jobs:
+  review:
+    if: github.event.action != 'labeled' || github.event.label.name == 'ai-cr:review'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      pull-requests: write
+    concurrency:
+      group: ai-cr-${{ github.event.pull_request.number }}
+      cancel-in-progress: true
+    steps:
+      - name: Ensure labels exist
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh label create "ai-cr:passed" --color 2ea44f --force --repo "${{ github.repository }}"
+          gh label create "ai-cr:failed" --color d73a4a --force --repo "${{ github.repository }}"
+          gh label create "ai-cr:review" --color 9e9e9e --force --repo "${{ github.repository }}"
+
+      - name: Checkout PR head
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: Run AI code review
+        id: review
+        uses: ./.github/actions/ai-code-review
+        with:
+          openrouter-api-key: ${{ secrets.OPENROUTER_API_KEY }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          pr-number: ${{ github.event.pull_request.number }}
+
+      - name: Post or update the sticky PR comment
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require("fs");
+            const marker = "<!-- ai-code-review-comment -->";
+            const body = `${marker}\n${fs.readFileSync("${{ steps.review.outputs.comment-path }}", "utf8")}`;
+
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.payload.pull_request.number,
+            });
+
+            const existing = comments.find(
+              (comment) => comment.user.login === "github-actions[bot]" && comment.body.includes(marker),
+            );
+
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: existing.id,
+                body,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.payload.pull_request.number,
+                body,
+              });
+            }
+
+      - name: Apply the verdict label
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERDICT: ${{ steps.review.outputs.verdict }}
+        run: |
+          case "$VERDICT" in
+            passed) add="ai-cr:passed"; remove="ai-cr:failed,ai-cr:review" ;;
+            failed) add="ai-cr:failed"; remove="ai-cr:passed,ai-cr:review" ;;
+            review) add="ai-cr:review"; remove="ai-cr:passed,ai-cr:failed" ;;
+            *)
+              echo "Unexpected verdict: $VERDICT" >&2
+              exit 1
+              ;;
+          esac
+
+          gh pr edit "${{ github.event.pull_request.number }}" \
+            --add-label "$add" \
+            --remove-label "$remove" \
+            --repo "${{ github.repository }}"
