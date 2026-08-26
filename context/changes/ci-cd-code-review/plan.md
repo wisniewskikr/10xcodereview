@@ -587,4 +587,4 @@ Not applicable — this is new infrastructure with no existing data or prior wor
 - [x] 4.2 Real PR: labels bootstrap, comment posted, correct single label applied — 1c98a2a
 - [x] 4.3 Push to same PR updates the existing comment instead of adding a new one — 1c98a2a
 - [x] 4.4 Adding `ai-cr:review` label triggers a fresh run and updates comment + label — 1c98a2a
-- [ ] 4.5 Fork PR does not trigger the workflow
+- [x] 4.5 Fork PR does not trigger the workflow
