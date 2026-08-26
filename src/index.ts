@@ -1,5 +1,5 @@
 function greet(name: string): string {
-  return `Hello World, ${name}!`;
+  return `Hello, ${name}!`;
 }
 
 console.log(greet("World"));
