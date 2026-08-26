@@ -4,7 +4,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { describe, it } from "node:test";
 import { MockLanguageModelV4 } from "ai/test";
-import { createCodeReviewer } from "./code-review-agent.js";
+import { createCodeReviewer, diffTarget } from "./code-review-agent.js";
 import { CodeReviewError } from "./errors.js";
 
 /**
@@ -198,5 +198,27 @@ describe("createCodeReviewer().review", () => {
 
     assert.equal(one.summary, "First reviewer.");
     assert.equal(two.summary, "Second reviewer.");
+  });
+});
+
+describe("diffTarget", () => {
+  it("strips hunks under packages/ so the reviewer never reviews its own source", () => {
+    const diff =
+      "diff --git a/packages/code-reviewer/src/ci.ts b/packages/code-reviewer/src/ci.ts\n" +
+      "index 111..222 100644\n--- a/packages/code-reviewer/src/ci.ts\n+++ b/packages/code-reviewer/src/ci.ts\n" +
+      "@@ -1 +1 @@\n-old\n+new\n";
+
+    const target = diffTarget("Touch the reviewer", diff);
+
+    assert.equal(target.kind, "diff");
+    assert.equal(target.kind === "diff" ? target.diff : undefined, "");
+  });
+
+  it("keeps hunks outside packages/ untouched", () => {
+    const diff = "diff --git a/src/index.ts b/src/index.ts\nindex 111..222 100644\n--- a/src/index.ts\n+++ b/src/index.ts\n@@ -1 +1 @@\n-old\n+new\n";
+
+    const target = diffTarget("Touch the app", diff);
+
+    assert.equal(target.kind === "diff" ? target.diff : undefined, diff);
   });
 });

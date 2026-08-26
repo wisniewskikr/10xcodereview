@@ -12,6 +12,7 @@ import { createReviewModel } from "../services/model.js";
 import { createFileTools } from "../tools/index.js";
 import { createWorkspace } from "../tools/workspace.js";
 import { getConfig } from "../utils/config.js";
+import { excludeDirectoryFromDiff } from "../utils/diff-filter.js";
 import { CodeReviewError } from "./errors.js";
 import { createTracingCallbacks } from "./tracing.js";
 
@@ -176,7 +177,14 @@ export function inlineTarget(fileName: string, code: string): CodeReviewTarget {
   return { kind: "inline", fileName, code };
 }
 
+/**
+ * `packages/` is where this reviewer itself lives, so its hunks are dropped
+ * before the diff ever reaches the model - otherwise a PR touching the
+ * reviewer's own source would have the reviewer grading itself.
+ */
+const selfReviewExclusion = "packages";
+
 /** Convenience for the CI entrypoint: a PR title/diff (and optional description) becomes a target. */
 export function diffTarget(title: string, diff: string, description?: string): CodeReviewTarget {
-  return { kind: "diff", title, diff, description };
+  return { kind: "diff", title, diff: excludeDirectoryFromDiff(diff, selfReviewExclusion), description };
 }
