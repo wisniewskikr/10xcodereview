@@ -559,18 +559,18 @@ Not applicable — this is new infrastructure with no existing data or prior wor
 
 #### Automated
 
-- [x] 2.1 Type checking passes: `npm run typecheck --prefix packages/code-reviewer`
-- [x] 2.2 Unit tests pass: `npm test --prefix packages/code-reviewer` (verdict mapping + never-throws coverage)
+- [x] 2.1 Type checking passes: `npm run typecheck --prefix packages/code-reviewer` — 15170fa
+- [x] 2.2 Unit tests pass: `npm test --prefix packages/code-reviewer` (verdict mapping + never-throws coverage) — 15170fa
 
 #### Manual
 
-- [x] 2.3 Manual `tsx src/ci.ts` run produces a comment file and a `verdict=` output line
+- [x] 2.3 Manual `tsx src/ci.ts` run produces a comment file and a `verdict=` output line — 15170fa
 
 ### Phase 3: Composite Action
 
 #### Automated
 
-- [ ] 3.1 `action.yml` validates (actionlint if available)
+- [x] 3.1 `action.yml` validates (actionlint if available)
 
 #### Manual
 

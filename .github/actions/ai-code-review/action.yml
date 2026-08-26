@@ -1,0 +1,82 @@
+name: "AI Code Review"
+description: "Runs the packages/code-reviewer agent against a PR diff and produces a verdict plus a rendered Markdown comment."
+
+inputs:
+  openrouter-api-key:
+    description: "OpenRouter API key used by the reviewer model. Composite actions have no secrets context, so the caller must pass this explicitly."
+    required: true
+  github-token:
+    description: "Token used for the gh pr view/diff calls that fetch the PR title, description, and diff."
+    required: true
+  pr-number:
+    description: "Pull request number to review."
+    required: true
+
+outputs:
+  verdict:
+    description: "One of passed | failed | review."
+    value: ${{ steps.review.outputs.verdict }}
+  comment-path:
+    description: "Path to the rendered Markdown comment body."
+    value: ${{ steps.review.outputs.comment-path }}
+
+runs:
+  using: "composite"
+  steps:
+    - name: Set up Node
+      uses: actions/setup-node@v4
+      with:
+        node-version: "22"
+
+    - name: Install reviewer dependencies
+      shell: bash
+      working-directory: ${{ github.workspace }}/packages/code-reviewer
+      run: npm ci
+
+    - name: Fetch and cap the PR diff
+      shell: bash
+      env:
+        GH_TOKEN: ${{ inputs.github-token }}
+      run: |
+        set -euo pipefail
+
+        gh pr view "${{ inputs.pr-number }}" --json title,body > "$RUNNER_TEMP/ai-review-pr.json"
+        gh pr diff "${{ inputs.pr-number }}" > "$RUNNER_TEMP/ai-review-diff-raw.txt"
+
+        # Writing title/description/diff to files (rather than shell variables) avoids
+        # multi-line PR bodies and diffs breaking on quoting.
+        # `slice(-3)`/`slice(-2)`, not a fixed leading index: `node -e` does not put a
+        # consistent placeholder at argv[1] across Node builds, so anchoring to the end
+        # of argv is the only offset that is stable.
+        node -e '
+          const fs = require("fs");
+          const [prJsonPath, titlePath, descriptionPath] = process.argv.slice(-3);
+          const pr = JSON.parse(fs.readFileSync(prJsonPath, "utf8"));
+          fs.writeFileSync(titlePath, pr.title ?? "", "utf8");
+          fs.writeFileSync(descriptionPath, pr.body ?? "", "utf8");
+        ' "$RUNNER_TEMP/ai-review-pr.json" "$RUNNER_TEMP/ai-review-title.txt" "$RUNNER_TEMP/ai-review-description.txt"
+
+        # Hard character cap, not a token estimate - see the plan's Critical Implementation Details.
+        node -e '
+          const fs = require("fs");
+          const cap = 60000;
+          const [inputPath, outputPath] = process.argv.slice(-2);
+          const text = fs.readFileSync(inputPath, "utf8");
+          const truncated = text.length > cap
+            ? text.slice(0, cap) + "\n\n[diff truncated at 60000 characters]"
+            : text;
+          fs.writeFileSync(outputPath, truncated, "utf8");
+        ' "$RUNNER_TEMP/ai-review-diff-raw.txt" "$RUNNER_TEMP/ai-review-diff.txt"
+
+    - name: Run the reviewer
+      id: review
+      shell: bash
+      env:
+        OPENROUTER_API_KEY: ${{ inputs.openrouter-api-key }}
+      run: |
+        npm run ci --prefix packages/code-reviewer -- \
+          --workspace "$GITHUB_WORKSPACE" \
+          --title-file "$RUNNER_TEMP/ai-review-title.txt" \
+          --description-file "$RUNNER_TEMP/ai-review-description.txt" \
+          --diff-file "$RUNNER_TEMP/ai-review-diff.txt" \
+          --comment-path "$RUNNER_TEMP/ai-review-comment.md"
