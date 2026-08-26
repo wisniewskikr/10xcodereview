@@ -547,13 +547,13 @@ Not applicable — this is new infrastructure with no existing data or prior wor
 
 #### Automated
 
-- [ ] 1.1 Type checking passes: `npm run typecheck --prefix packages/code-reviewer`
-- [ ] 1.2 Unit tests pass: `npm test --prefix packages/code-reviewer`
-- [ ] 1.3 Build succeeds: `npm run build --prefix packages/code-reviewer`
+- [x] 1.1 Type checking passes: `npm run typecheck --prefix packages/code-reviewer`
+- [x] 1.2 Unit tests pass: `npm test --prefix packages/code-reviewer`
+- [x] 1.3 Build succeeds: `npm run build --prefix packages/code-reviewer`
 
 #### Manual
 
-- [ ] 1.4 `npm start --prefix packages/code-reviewer` still runs the sample inline review with no regression
+- [x] 1.4 `npm start --prefix packages/code-reviewer` still runs the sample inline review with no regression
 
 ### Phase 2: CI Entrypoint
 

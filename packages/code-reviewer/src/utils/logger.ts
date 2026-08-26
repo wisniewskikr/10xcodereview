@@ -21,7 +21,7 @@ function write(level: Level, message: string): void {
   const now = new Date();
   const line = `[${timestamp(now)}] [${level}] ${message}`;
 
-  console.log(line);
+  console.error(line);
 
   const logDirectory = fromProjectRoot(getConfig().logDirectory);
   mkdirSync(logDirectory, { recursive: true });

@@ -10,6 +10,7 @@
 export {
   createCodeReviewAgent,
   createCodeReviewer,
+  diffTarget,
   fileTarget,
   inlineTarget,
   type CodeReviewAgentOptions,
@@ -20,10 +21,16 @@ export {
 
 export { CodeReviewError, type CodeReviewErrorReason } from "./errors.js";
 
+export { computeVerdict } from "./verdict.js";
+
+export { renderReviewMarkdown } from "../cli/render-markdown.js";
+
 export {
   codeReviewSchema,
   findingSchema,
   type CodeReview,
+  type Criteria,
+  type Criterion,
   type Finding,
 } from "../schemas/code-review.js";
 

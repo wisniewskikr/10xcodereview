@@ -6,7 +6,7 @@
   "maxRetries": 2,
   "logDirectory": "logs",
   "appName": "code-reviewer",
-  "maxSteps": 16,
+  "maxSteps": 40,
   "maxFileBytes": 262144,
   "maxSearchResults": 40
 }

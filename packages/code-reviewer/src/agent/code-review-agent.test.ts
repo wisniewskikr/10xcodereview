@@ -24,6 +24,15 @@ function makeWorkspaceRoot(): string {
   return root;
 }
 
+const passingCriteria = {
+  implementationCorrectness: { grade: 9, justification: "Does what it says." },
+  idiomaticity: { grade: 9, justification: "Fits the codebase." },
+  complexity: { grade: 9, justification: "Simple and flat." },
+  testCoverage: { grade: 9, justification: "Covered." },
+  documentation: { grade: 9, justification: "Clear." },
+  securityAndSafety: { grade: 9, justification: "No issues." },
+};
+
 function respondingWith(text: string): MockLanguageModelV4 {
   return new MockLanguageModelV4({
     doGenerate: async () => ({
@@ -64,8 +73,10 @@ describe("createCodeReviewer().review", () => {
       respondingWith(
         JSON.stringify({
           summary: "Looks fine.",
+          criteria: passingCriteria,
           findings: [
             {
+              file: "src/target.ts",
               line: 1,
               severity: "info",
               title: "Nothing wrong",
@@ -145,10 +156,14 @@ describe("createCodeReviewer().review", () => {
 
   it("builds two reviewers on different models without interference", async () => {
     const first = reviewerOn(
-      respondingWith(JSON.stringify({ summary: "First reviewer.", findings: [] })),
+      respondingWith(
+        JSON.stringify({ summary: "First reviewer.", criteria: passingCriteria, findings: [] }),
+      ),
     );
     const second = reviewerOn(
-      respondingWith(JSON.stringify({ summary: "Second reviewer.", findings: [] })),
+      respondingWith(
+        JSON.stringify({ summary: "Second reviewer.", criteria: passingCriteria, findings: [] }),
+      ),
     );
 
     const target = { kind: "file" as const, path: "src/target.ts" };

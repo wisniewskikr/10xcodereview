@@ -109,7 +109,7 @@ export function createCodeReviewer(options: CodeReviewerOptions = {}): CodeRevie
   const agent = createCodeReviewAgent(options);
 
   async function review(target: CodeReviewTarget): Promise<CodeReview> {
-    const label = target.kind === "file" ? target.path : target.fileName;
+    const label = target.kind === "diff" ? target.title : target.kind === "file" ? target.path : target.fileName;
     const prompt = buildCodeReviewPrompt(target);
 
     let result;
@@ -167,4 +167,9 @@ export function fileTarget(path: string): CodeReviewTarget {
 /** Convenience for fixtures that carry their code as a string. */
 export function inlineTarget(fileName: string, code: string): CodeReviewTarget {
   return { kind: "inline", fileName, code };
+}
+
+/** Convenience for the CI entrypoint: a PR title/diff (and optional description) becomes a target. */
+export function diffTarget(title: string, diff: string, description?: string): CodeReviewTarget {
+  return { kind: "diff", title, diff, description };
 }

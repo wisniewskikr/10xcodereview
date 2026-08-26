@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
+  "engines": { "node": ">=20.12" },
   "description": "AI-powered code reviewer built on the Vercel AI SDK + OpenRouter",
   "main": "dist/agent/index.js",
   "types": "dist/agent/index.d.ts",

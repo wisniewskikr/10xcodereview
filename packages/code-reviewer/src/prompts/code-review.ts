@@ -44,7 +44,8 @@ export const defaultPromptVariant: CodeReviewPromptVariant = "default";
  */
 export type CodeReviewTarget =
   | { kind: "file"; path: string }
-  | { kind: "inline"; fileName: string; code: string };
+  | { kind: "inline"; fileName: string; code: string }
+  | { kind: "diff"; title: string; description?: string; diff: string };
 
 /**
  * Builds the user message for a review target.
@@ -74,6 +75,21 @@ export function buildCodeReviewPrompt(target: CodeReviewTarget): string {
         "Then follow whatever you need to judge it: the modules it imports, the callers of what",
         "it exports, a sibling type whose shape you are unsure of.",
         "Report findings on that file only; everything else you read is context.",
+      ].join("\n");
+
+    case "diff":
+      return [
+        `Review this pull request: ${target.title}`,
+        ...(target.description !== undefined ? ["", target.description] : []),
+        "",
+        "```diff",
+        target.diff,
+        "```",
+        "",
+        "The diff above is the whole change under review, but hunks alone rarely give you the full",
+        "picture - use your readFile and search tools to read any file the diff touches, its",
+        "imports, and its callers before judging it.",
+        "Grade the change against all six criteria and name the affected file on every finding.",
       ].join("\n");
   }
 }
