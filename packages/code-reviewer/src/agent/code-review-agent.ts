@@ -122,13 +122,20 @@ export function createCodeReviewer(options: CodeReviewerOptions = {}): CodeRevie
     try {
       return result.output;
     } catch (error) {
-      // `.output` throws when the run never finished with "stop", which is what
-      // an exhausted step budget looks like from here.
+      // `.output` throws when the run never finished with "stop". That covers two
+      // distinct causes that need distinct advice: the step loop ran out of turns
+      // (raise maxSteps), or the model's own response was cut off mid-object by
+      // maxOutputTokens (raise maxOutputTokens instead - more steps would not help).
+      const message =
+        result.finishReason === "length"
+          ? `Reviewing ${label} was cut off by maxOutputTokens after ${result.steps.length} ` +
+            `step(s) before producing a complete review. Raise maxOutputTokens.`
+          : `Reviewing ${label} ran out of steps after ${result.steps.length} step(s) ` +
+            `without producing a review. Raise maxSteps or narrow the target.`;
+
       throw new CodeReviewError({
         reason: "step-budget-exhausted",
-        message:
-          `Reviewing ${label} ran out of steps after ${result.steps.length} step(s) ` +
-          `without producing a review. Raise maxSteps or narrow the target.`,
+        message,
         cause: error,
         steps: result.steps.length,
         usage: result.usage,

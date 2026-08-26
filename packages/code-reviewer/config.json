@@ -1,7 +1,7 @@
 {
   "model": "anthropic/claude-sonnet-5",
   "temperature": 0,
-  "maxOutputTokens": 8000,
+  "maxOutputTokens": 16000,
   "requestTimeoutMs": 120000,
   "maxRetries": 2,
   "logDirectory": "logs",

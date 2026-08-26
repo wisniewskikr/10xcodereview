@@ -580,7 +580,7 @@ Not applicable — this is new infrastructure with no existing data or prior wor
 
 #### Automated
 
-- [x] 4.1 Workflow YAML validates (actionlint if available)
+- [x] 4.1 Workflow YAML validates (actionlint if available) — 9ebaed1
 
 #### Manual
 
