@@ -574,7 +574,7 @@ Not applicable — this is new infrastructure with no existing data or prior wor
 
 #### Manual
 
-- [x] 3.2 A test workflow invoking the action end-to-end produces `verdict`/`comment-path` outputs
+- [x] 3.2 A test workflow invoking the action end-to-end produces `verdict`/`comment-path` outputs — 1c98a2a
 
 ### Phase 4: Workflow — Trigger, Labels, Comment, Retry
 
@@ -584,7 +584,7 @@ Not applicable — this is new infrastructure with no existing data or prior wor
 
 #### Manual
 
-- [x] 4.2 Real PR: labels bootstrap, comment posted, correct single label applied
-- [x] 4.3 Push to same PR updates the existing comment instead of adding a new one
-- [x] 4.4 Adding `ai-cr:review` label triggers a fresh run and updates comment + label
+- [x] 4.2 Real PR: labels bootstrap, comment posted, correct single label applied — 1c98a2a
+- [x] 4.3 Push to same PR updates the existing comment instead of adding a new one — 1c98a2a
+- [x] 4.4 Adding `ai-cr:review` label triggers a fresh run and updates comment + label — 1c98a2a
 - [ ] 4.5 Fork PR does not trigger the workflow
