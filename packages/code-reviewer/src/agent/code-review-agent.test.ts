@@ -44,6 +44,18 @@ function respondingWith(text: string): MockLanguageModelV4 {
   });
 }
 
+/** A model whose structured output gets cut off mid-object by maxOutputTokens. */
+function cutOffByLength(text: string): MockLanguageModelV4 {
+  return new MockLanguageModelV4({
+    doGenerate: async () => ({
+      content: [{ type: "text" as const, text }],
+      finishReason: { unified: "length" as const, raw: undefined },
+      usage,
+      warnings: [],
+    }),
+  });
+}
+
 /** A model that only ever asks for another tool call, so the budget must bite. */
 function alwaysCallingTools(): MockLanguageModelV4 {
   return new MockLanguageModelV4({
@@ -130,6 +142,21 @@ describe("createCodeReviewer().review", () => {
         assert.ok(CodeReviewError.isInstance(error), "expected a CodeReviewError");
         assert.equal(error.reason, "step-budget-exhausted");
         assert.equal(error.steps, 2);
+        return true;
+      },
+    );
+  });
+
+  it("names maxOutputTokens, not maxSteps, when the model is cut off by length", async () => {
+    const reviewer = reviewerOn(cutOffByLength('{"summary": "The change looks fi'));
+
+    await assert.rejects(
+      () => reviewer.review({ kind: "file", path: "src/target.ts" }),
+      (error: unknown) => {
+        assert.ok(CodeReviewError.isInstance(error), "expected a CodeReviewError");
+        assert.equal(error.reason, "step-budget-exhausted");
+        assert.match(error.message, /maxOutputTokens/);
+        assert.doesNotMatch(error.message, /maxSteps/);
         return true;
       },
     );
