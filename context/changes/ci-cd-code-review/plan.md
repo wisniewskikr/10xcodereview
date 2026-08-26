@@ -547,24 +547,24 @@ Not applicable — this is new infrastructure with no existing data or prior wor
 
 #### Automated
 
-- [x] 1.1 Type checking passes: `npm run typecheck --prefix packages/code-reviewer`
-- [x] 1.2 Unit tests pass: `npm test --prefix packages/code-reviewer`
-- [x] 1.3 Build succeeds: `npm run build --prefix packages/code-reviewer`
+- [x] 1.1 Type checking passes: `npm run typecheck --prefix packages/code-reviewer` — 9d88484
+- [x] 1.2 Unit tests pass: `npm test --prefix packages/code-reviewer` — 9d88484
+- [x] 1.3 Build succeeds: `npm run build --prefix packages/code-reviewer` — 9d88484
 
 #### Manual
 
-- [x] 1.4 `npm start --prefix packages/code-reviewer` still runs the sample inline review with no regression
+- [x] 1.4 `npm start --prefix packages/code-reviewer` still runs the sample inline review with no regression — 9d88484
 
 ### Phase 2: CI Entrypoint
 
 #### Automated
 
-- [ ] 2.1 Type checking passes: `npm run typecheck --prefix packages/code-reviewer`
-- [ ] 2.2 Unit tests pass: `npm test --prefix packages/code-reviewer` (verdict mapping + never-throws coverage)
+- [x] 2.1 Type checking passes: `npm run typecheck --prefix packages/code-reviewer`
+- [x] 2.2 Unit tests pass: `npm test --prefix packages/code-reviewer` (verdict mapping + never-throws coverage)
 
 #### Manual
 
-- [ ] 2.3 Manual `tsx src/ci.ts` run produces a comment file and a `verdict=` output line
+- [x] 2.3 Manual `tsx src/ci.ts` run produces a comment file and a `verdict=` output line
 
 ### Phase 3: Composite Action
 
