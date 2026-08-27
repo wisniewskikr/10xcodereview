@@ -1,0 +1,32 @@
+# yaml-language-server: $schema=https://promptfoo.dev/config-schema.json
+description: code-reviewer — React 16→19 migration eval (mock-only, offline)
+
+# The deterministic column of promptfooconfig.yaml, split into its own config:
+# promptfoo 0.122's `--filter-providers` does not match a custom file provider's
+# label, so the mock column can't be isolated from the main config on the CLI.
+# This runs with no API key and no model in the loop - `schema_valid` and
+# `review_fails` only (g-eval needs the judge, which needs a key).
+
+prompts:
+  - "{{diff}}"
+
+providers:
+  - id: file://./provider.ts
+    label: mock
+    config:
+      mock: true
+
+defaultTest:
+  assert:
+    - type: is-json
+      value: file://./schemas/code-review.schema.json
+      metric: schema_valid
+    - type: javascript
+      value: file://./asserts/review-fails.mjs
+      metric: review_fails
+
+tests:
+  - file://./datasets/react19-migration.yaml
+
+evaluateOptions:
+  repeat: 2

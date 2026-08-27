@@ -2,7 +2,7 @@ node_modules/
 dist/
 logs/*.log
 .env
-eval-results.json
+eval-results.*
 eval/schemas/
 .promptfoo/
 eval/output/

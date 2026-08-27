@@ -23,7 +23,8 @@
     "typecheck": "tsc --noEmit && tsc --noEmit -p tsconfig.test.json",
     "test": "node --import tsx --test \"src/**/*.test.ts\" \"eval/**/*.test.ts\"",
     "eval:schema": "tsx eval/gen-schema.ts",
-    "eval": "npm run build && npm run eval:schema && promptfoo eval -c eval/promptfooconfig.yaml -o eval-results.json"
+    "eval": "npm run build && npm run eval:schema && promptfoo eval -c eval/promptfooconfig.yaml -o eval-results.json -o eval-results.html",
+    "eval:mock": "npm run build && npm run eval:schema && promptfoo eval -c eval/promptfooconfig.mock.yaml"
   },
   "dependencies": {
     "@openrouter/ai-sdk-provider": "^3.0.0",

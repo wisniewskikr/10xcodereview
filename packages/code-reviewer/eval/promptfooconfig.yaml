@@ -1,0 +1,76 @@
+# yaml-language-server: $schema=https://promptfoo.dev/config-schema.json
+description: code-reviewer — React 16→19 migration eval (v1)
+
+# Passthrough. The custom provider ignores the prompt and builds its review
+# target from the dataset row in context.vars ({ title, description, diff }).
+prompts:
+  - "{{diff}}"
+
+providers:
+  - id: file://./provider.ts
+    label: sonnet-4.5
+    config:
+      model: anthropic/claude-sonnet-4.5
+  - id: file://./provider.ts
+    label: glm-5.1
+    config:
+      model: z-ai/glm-5.1
+  - id: file://./provider.ts
+    label: deepseek-v4-flash
+    config:
+      model: deepseek/deepseek-v4-flash
+  - id: file://./provider.ts
+    label: mock
+    config:
+      mock: true
+
+defaultTest:
+  options:
+    # External judge for the g-eval assertion. A different family from the
+    # Anthropic model under test, on purpose. Swap for any other `openrouter:`
+    # slug if this one is unavailable; the mock column does not use it.
+    provider:
+      id: openrouter:openai/gpt-5
+      config:
+        temperature: 0
+        max_tokens: 8192
+  assert:
+    # 1. Structured output matches the generated JSON Schema (no model).
+    - type: is-json
+      value: file://./schemas/code-review.schema.json
+      metric: schema_valid
+
+    # 2. Deterministic "the review actually fails" gate (no model).
+    - type: javascript
+      value: file://./asserts/review-fails.mjs
+      metric: review_fails
+
+    # 3. LLM-as-a-judge: did the review find the three known flaws? Advisory —
+    #    threshold is 2 of 3. Each criterion names the React-19-specific failure
+    #    mode so a review that explains it is credited.
+    - type: g-eval
+      metric: finding_recall
+      threshold: 0.67
+      value:
+        - >-
+          The review identifies that the unread counter is updated from a stale
+          closure value after an await (setUnread(unread - 1) / setUnread(0))
+          instead of a functional updater, and that React 19's automatic batching
+          makes concurrent stream increments get overwritten.
+        - >-
+          The review identifies that the first useEffect subscribes to the
+          activity stream but never returns an unsubscribe/cleanup function, so
+          subscriptions leak on userId change and unmount, and React 19
+          StrictMode's double-invoke leaves two live subscriptions at mount.
+        - >-
+          The review identifies that the persistLastSeen useEffect reads `events`
+          but lists only `[userId]` in its dependency array, so it never re-runs
+          as new events arrive and the server "last seen" marker never advances.
+
+tests:
+  - file://./datasets/react19-migration.yaml
+
+evaluateOptions:
+  maxConcurrency: 3
+  # Dampen agent non-determinism: each provider runs the row twice.
+  repeat: 2

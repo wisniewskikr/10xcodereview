@@ -1,0 +1,12 @@
+# Eval dataset. One row = one review case. Add a row to add a fixture.
+#
+# `diff` is loaded from a file; the path is resolved relative to the promptfoo
+# CONFIG directory (eval/), not this file.
+- vars:
+    title: "Migrate UserActivityFeed from a React 16 class component to React 19 hooks"
+    description: >-
+      Converts the class component to a function component: this.state -> useState,
+      lifecycle methods -> useEffect, PropTypes -> a TypeScript props interface,
+      ReactDOM.render -> createRoot, and a React 16 -> 19 dependency bump with
+      StrictMode added at the root.
+    diff: "file://fixtures/react19-migration/change.diff"

@@ -542,29 +542,29 @@ re-run to confirm a flip); that `packages/**` diff paths are stripped by
 
 #### Automated
 
-- [x] 2.1 `npm test` runs `eval/fixtures.test.ts` and it passes
-- [x] 2.2 `expected-flaws.json` parses to an array of exactly 3 unique-id objects
-- [x] 2.3 `grep -c '^\+\+\+ b/packages/' change.diff` returns 0
-- [x] 2.4 `npm run typecheck` still passes (fixture `.tsx` outside `src/` does not enter the build)
+- [x] 2.1 `npm test` runs `eval/fixtures.test.ts` and it passes — 853e4be
+- [x] 2.2 `expected-flaws.json` parses to an array of exactly 3 unique-id objects — 853e4be
+- [x] 2.3 `grep -c '^\+\+\+ b/packages/' change.diff` returns 0 — 853e4be
+- [x] 2.4 `npm run typecheck` still passes (fixture `.tsx` outside `src/` does not enter the build) — 853e4be
 
 #### Manual
 
-- [x] 2.5 React-literate reader confirms all three flaws are real, correctness-impacting, and diff-visible
-- [x] 2.6 The diff reads as a plausible, "rather complex" migration
-- [x] 2.7 The benign changes are correct — no accidental fourth bug
+- [x] 2.5 React-literate reader confirms all three flaws are real, correctness-impacting, and diff-visible — 853e4be
+- [x] 2.6 The diff reads as a plausible, "rather complex" migration — 853e4be
+- [x] 2.7 The benign changes are correct — no accidental fourth bug — 853e4be
 
 ### Phase 3: Provider, promptfoo config, assertions, and end-to-end run
 
 #### Automated
 
-- [ ] 3.1 `npm test` passes, including `eval/provider.test.ts` and `eval/fixtures.test.ts`
-- [ ] 3.2 `npm run typecheck` passes
-- [ ] 3.3 `npm run eval` with no key: `mock` row completes, `schema_valid` + `review_fails` green for it, `eval-results.json` written
-- [ ] 3.4 `npm run eval` with a valid key: all 4 providers run, `repeat: 2` honoured (8 executions), HTML report has a `finding_recall` column, exit code 0 iff every `review_fails` passed
-- [ ] 3.5 `promptfoo eval … --filter-providers mock` runs only the deterministic column and `review_fails` passes
+- [x] 3.1 `npm test` passes, including `eval/provider.test.ts` and `eval/fixtures.test.ts`
+- [x] 3.2 `npm run typecheck` passes
+- [x] 3.3 `npm run eval` with no key: `mock` row completes, `schema_valid` + `review_fails` green for it, `eval-results.json` written
+- [ ] 3.4 `npm run eval` with a valid key: all 4 providers run, `repeat: 2` honoured (8 executions), HTML report has a `finding_recall` column, exit code 0 iff every `review_fails` passed — BLOCKED: OpenRouter account out of credits (402). Pipeline reaches all 4 providers + judge; 8 executions produced; HTML report + `finding_recall` column present. Re-run once credits are topped up.
+- [x] 3.5 `promptfoo eval … --filter-providers mock` runs only the deterministic column and `review_fails` passes — also `npm run eval:mock` (dedicated offline config; `--filter-providers` label match needed the provider identity fix)
 
 #### Manual
 
-- [ ] 3.6 HTML report shows 3 real-model columns + `mock`, one row, per-cell `schema_valid` / `review_fails` / `finding_recall`
-- [ ] 3.7 Spot-check one model's findings vs `expected-flaws.json`; `g-eval` grade is reasonable
-- [ ] 3.8 Re-run once; `mock` stable, any real-model flip understood as non-determinism
+- [x] 3.6 HTML report shows 3 real-model columns + `mock`, one row, per-cell `schema_valid` / `review_fails` / `finding_recall` — verified via `eval-results.json`: labels `sonnet-4.5` / `glm-5.1` / `deepseek-v4-flash` / `mock`, 1 dataset row, 3 metrics/cell; `eval-results.html` (261 KB) written
+- [ ] 3.7 Spot-check one model's findings vs `expected-flaws.json`; `g-eval` grade is reasonable — BLOCKED: no real-model output (402 credits). `mock` review names all three flaws and `g-eval` splits into 3 criteria as designed.
+- [ ] 3.8 Re-run once; `mock` stable, any real-model flip understood as non-determinism — `mock` verified stable across repeated runs; real-model half blocked (402 credits).
