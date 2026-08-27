@@ -528,30 +528,30 @@ re-run to confirm a flip); that `packages/**` diff paths are stripped by
 
 #### Automated
 
-- [x] 1.1 `npm install` succeeds; `npx promptfoo --version` prints a version
-- [x] 1.2 `npm run build` succeeds (unchanged)
-- [x] 1.3 `npm run eval:schema` creates a valid `eval/schemas/code-review.schema.json` with a `properties.criteria` object
-- [x] 1.4 `npm run typecheck` passes
-- [x] 1.5 `git status --porcelain eval/schemas` shows the generated schema is ignored
+- [x] 1.1 `npm install` succeeds; `npx promptfoo --version` prints a version — 189c6a6
+- [x] 1.2 `npm run build` succeeds (unchanged) — 189c6a6
+- [x] 1.3 `npm run eval:schema` creates a valid `eval/schemas/code-review.schema.json` with a `properties.criteria` object — 189c6a6
+- [x] 1.4 `npm run typecheck` passes — 189c6a6
+- [x] 1.5 `git status --porcelain eval/schemas` shows the generated schema is ignored — 189c6a6
 
 #### Manual
 
-- [x] 1.6 Generated schema, eyeballed, has all six criteria and the full `findings` shape
+- [x] 1.6 Generated schema, eyeballed, has all six criteria and the full `findings` shape — 189c6a6
 
 ### Phase 2: Fixture — the React 16→19 migration diff with three flaws
 
 #### Automated
 
-- [ ] 2.1 `npm test` runs `eval/fixtures.test.ts` and it passes
-- [ ] 2.2 `expected-flaws.json` parses to an array of exactly 3 unique-id objects
-- [ ] 2.3 `grep -c '^\+\+\+ b/packages/' change.diff` returns 0
-- [ ] 2.4 `npm run typecheck` still passes (fixture `.tsx` outside `src/` does not enter the build)
+- [x] 2.1 `npm test` runs `eval/fixtures.test.ts` and it passes
+- [x] 2.2 `expected-flaws.json` parses to an array of exactly 3 unique-id objects
+- [x] 2.3 `grep -c '^\+\+\+ b/packages/' change.diff` returns 0
+- [x] 2.4 `npm run typecheck` still passes (fixture `.tsx` outside `src/` does not enter the build)
 
 #### Manual
 
-- [ ] 2.5 React-literate reader confirms all three flaws are real, correctness-impacting, and diff-visible
-- [ ] 2.6 The diff reads as a plausible, "rather complex" migration
-- [ ] 2.7 The benign changes are correct — no accidental fourth bug
+- [x] 2.5 React-literate reader confirms all three flaws are real, correctness-impacting, and diff-visible
+- [x] 2.6 The diff reads as a plausible, "rather complex" migration
+- [x] 2.7 The benign changes are correct — no accidental fourth bug
 
 ### Phase 3: Provider, promptfoo config, assertions, and end-to-end run
 

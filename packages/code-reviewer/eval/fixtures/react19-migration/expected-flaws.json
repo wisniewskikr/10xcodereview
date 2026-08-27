@@ -1,0 +1,29 @@
+[
+  {
+    "id": "stale-closure-unread",
+    "file": "src/components/UserActivityFeed.tsx",
+    "lineHint": "markOneRead / markAllRead - setUnread(unread - 1) and setUnread(0) after an await",
+    "title": "Unread counter written from a stale render value instead of a functional updater",
+    "whyImpactful": "markOneRead awaits api.markRead and then calls setUnread(unread - 1). `unread` is frozen at the value from the render that created the handler. Any events that streamed in during the request (the subscription runs setUnread(prev => prev + 1)) are silently discarded, so the badge under-counts and can go negative. The class version used this.setState(prev => ({ unread: prev.unread - 1 })), which did not have this bug.",
+    "react19Note": "React 19 automatically batches state updates inside promise continuations and other async contexts, not just React event handlers. In React 17 the post-await setUnread often flushed on its own; in React 19 it is batched together with the concurrent increments from the stream, so the stale-base overwrite that used to be a rare race is now the normal outcome.",
+    "detectionHint": "Flag setUnread(unread - 1) and setUnread(0) that run after `await`; the fix is setUnread(prev => prev - 1) / an updater that accounts for concurrent increments."
+  },
+  {
+    "id": "missing-effect-cleanup",
+    "file": "src/components/UserActivityFeed.tsx",
+    "lineHint": "first useEffect keyed on [userId] - activityStream.subscribe(...) return value is never returned",
+    "title": "Subscription effect never returns its unsubscribe function",
+    "whyImpactful": "activityStream.subscribe returns an unsubscribe handle. The effect assigns it to `unsubscribe` and then does nothing with it - the effect returns undefined. On every userId change the previous listener stays attached, and on unmount every listener stays attached, so callbacks keep firing setState on an unmounted tree and the unread count grows without bound. The class version tore the subscription down in componentWillUnmount and re-created it in componentDidUpdate.",
+    "react19Note": "React 19's StrictMode mounts every component, runs effects, then runs cleanup and runs the effects again to surface exactly this class of bug. With no cleanup the double-invoke leaves two live subscriptions from the very first mount in development, and the production tree still leaks one per userId change.",
+    "detectionHint": "The effect body calls a subscribe API that returns a disposer but the arrow function has no `return () => unsubscribe()`."
+  },
+  {
+    "id": "stale-effect-deps",
+    "file": "src/components/UserActivityFeed.tsx",
+    "lineHint": "second useEffect - reads events[0].id but dependency array is [userId]",
+    "title": "persistLastSeen effect omits `events` from its dependency array",
+    "whyImpactful": "The effect calls api.persistLastSeen(userId, events[0].id) but lists only [userId] as its dependencies. It runs once when userId is set and then never re-runs as new events arrive, so the server's \"last seen\" marker is pinned to whichever event was newest at that moment (or never advances at all, since events is empty on the first run and the effect early-returns). Other devices never catch up. The class version re-checked the newest event in componentDidUpdate on every state change.",
+    "react19Note": "Not React-19-specific in mechanism, but React 19 ships the react-hooks exhaustive-deps lint rule as the default recommendation and StrictMode's re-run makes the 'runs once, stays frozen' behaviour easy to observe in tests.",
+    "detectionHint": "Compare the identifiers read in the effect body (events) against the dependency array ([userId]); `events` is missing."
+  }
+]
