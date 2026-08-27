@@ -557,14 +557,14 @@ re-run to confirm a flip); that `packages/**` diff paths are stripped by
 
 #### Automated
 
-- [x] 3.1 `npm test` passes, including `eval/provider.test.ts` and `eval/fixtures.test.ts`
-- [x] 3.2 `npm run typecheck` passes
-- [x] 3.3 `npm run eval` with no key: `mock` row completes, `schema_valid` + `review_fails` green for it, `eval-results.json` written
+- [x] 3.1 `npm test` passes, including `eval/provider.test.ts` and `eval/fixtures.test.ts` — b617099
+- [x] 3.2 `npm run typecheck` passes — b617099
+- [x] 3.3 `npm run eval` with no key: `mock` row completes, `schema_valid` + `review_fails` green for it, `eval-results.json` written — b617099
 - [ ] 3.4 `npm run eval` with a valid key: all 4 providers run, `repeat: 2` honoured (8 executions), HTML report has a `finding_recall` column, exit code 0 iff every `review_fails` passed — BLOCKED: OpenRouter account out of credits (402). Pipeline reaches all 4 providers + judge; 8 executions produced; HTML report + `finding_recall` column present. Re-run once credits are topped up.
-- [x] 3.5 `promptfoo eval … --filter-providers mock` runs only the deterministic column and `review_fails` passes — also `npm run eval:mock` (dedicated offline config; `--filter-providers` label match needed the provider identity fix)
+- [x] 3.5 `promptfoo eval … --filter-providers mock` runs only the deterministic column and `review_fails` passes — also `npm run eval:mock` (dedicated offline config; `--filter-providers` label match needed the provider identity fix) — b617099
 
 #### Manual
 
-- [x] 3.6 HTML report shows 3 real-model columns + `mock`, one row, per-cell `schema_valid` / `review_fails` / `finding_recall` — verified via `eval-results.json`: labels `sonnet-4.5` / `glm-5.1` / `deepseek-v4-flash` / `mock`, 1 dataset row, 3 metrics/cell; `eval-results.html` (261 KB) written
+- [x] 3.6 HTML report shows 3 real-model columns + `mock`, one row, per-cell `schema_valid` / `review_fails` / `finding_recall` — verified via `eval-results.json`: labels `sonnet-4.5` / `glm-5.1` / `deepseek-v4-flash` / `mock`, 1 dataset row, 3 metrics/cell; `eval-results.html` (261 KB) written — b617099
 - [ ] 3.7 Spot-check one model's findings vs `expected-flaws.json`; `g-eval` grade is reasonable — BLOCKED: no real-model output (402 credits). `mock` review names all three flaws and `g-eval` splits into 3 criteria as designed.
 - [ ] 3.8 Re-run once; `mock` stable, any real-model flip understood as non-determinism — `mock` verified stable across repeated runs; real-model half blocked (402 credits).
