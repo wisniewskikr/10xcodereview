@@ -528,15 +528,15 @@ re-run to confirm a flip); that `packages/**` diff paths are stripped by
 
 #### Automated
 
-- [ ] 1.1 `npm install` succeeds; `npx promptfoo --version` prints a version
-- [ ] 1.2 `npm run build` succeeds (unchanged)
-- [ ] 1.3 `npm run eval:schema` creates a valid `eval/schemas/code-review.schema.json` with a `properties.criteria` object
-- [ ] 1.4 `npm run typecheck` passes
-- [ ] 1.5 `git status --porcelain eval/schemas` shows the generated schema is ignored
+- [x] 1.1 `npm install` succeeds; `npx promptfoo --version` prints a version
+- [x] 1.2 `npm run build` succeeds (unchanged)
+- [x] 1.3 `npm run eval:schema` creates a valid `eval/schemas/code-review.schema.json` with a `properties.criteria` object
+- [x] 1.4 `npm run typecheck` passes
+- [x] 1.5 `git status --porcelain eval/schemas` shows the generated schema is ignored
 
 #### Manual
 
-- [ ] 1.6 Generated schema, eyeballed, has all six criteria and the full `findings` shape
+- [x] 1.6 Generated schema, eyeballed, has all six criteria and the full `findings` shape
 
 ### Phase 2: Fixture — the React 16→19 migration diff with three flaws
 
